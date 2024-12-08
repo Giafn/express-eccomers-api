@@ -9,10 +9,13 @@ class ItemRepository {
         return item;
     }
     
-    async findAll(filters, order) {
+    async findAll(filters, order, categoryId) {
         return await Item.findAll({
-            where: filters,
-            order: order,  // Menggunakan parameter order yang diberikan
+            where: {
+                ...filters,
+                ...(categoryId && { category_id: categoryId })
+            },
+            order: order,
             include: [
                 {
                 model: ImageItem, // Menginclude ImageItem dalam query
@@ -40,8 +43,15 @@ class ItemRepository {
         ] });
     }
     
-    async update(id, updateData) {
-        return await Item.update(updateData, { where: { id } });
+    async update(id, updateData, imageUrls) {
+        await Item.update(updateData, { where: { id } });
+        if (imageUrls !== null && imageUrls.length > 0) {
+            console.log("anak bai" + imageUrls);
+            await ImageItem.destroy({ where: { item_id: id } });
+            const images = imageUrls.map((url) => ({ item_id: id, url }));
+            await ImageItem.bulkCreate(images);
+        }
+        return await this.findById(id);
     }
     
     async delete(id) {

@@ -3,8 +3,8 @@ class UpdateItem {
       this.itemRepository = itemRepository;
     }
   
-    async execute(id, updateData) {
-      return await this.itemRepository.update(id, updateData);
+    async execute(id, updateData, imageUrls) {
+      return await this.itemRepository.update(id, updateData, imageUrls);
     }
   }
   

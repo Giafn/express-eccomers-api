@@ -24,8 +24,10 @@ class ReadItem {
       if (filters.maxPrice) where.price = { ...where.price, [Op.lte]: filters.maxPrice };
       if (filters.startDate) where.createdAt = { [Op.gte]: filters.startDate };
       if (filters.endDate) where.createdAt = { ...where.createdAt, [Op.lte]: filters.endDate };
+
+      const categoryId = filters.categoryId;
   
-      return await this.itemRepository.findAll(where, order);
+      return await this.itemRepository.findAll(where, order, categoryId);
     }
   }
   

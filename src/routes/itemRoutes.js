@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/", upload.array("images", 5), itemController.create);
 router.get("/", itemController.read);
 router.get("/:id", itemController.readById);
-router.put("/:id", upload.none(), itemController.update);
+router.put("/:id", upload.array("images", 5), itemController.update);
 router.delete("/:id", itemController.delete);
 
 module.exports = router;
