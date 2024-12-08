@@ -28,7 +28,16 @@ class ItemRepository {
     
     
     async findById(id) {
-        return await Item.findByPk(id, { include: [ImageItem] });
+        return await Item.findByPk(id, { include: [
+            {
+                model: ImageItem,
+                as: 'images'
+            },
+            {
+                model: Category,
+                as: 'category'
+            }
+        ] });
     }
     
     async update(id, updateData) {

@@ -2,6 +2,7 @@ const ItemRepository = require("../repositories/itemRepository");
 const CategoryRepository = require("../repositories/categoryRepository");
 const CreateItem = require("../usecases/createItem");
 const ReadItem = require("../usecases/readItem");
+const ReadItemById = require("../usecases/readItemById");
 const UpdateItem = require("../usecases/updateItem");
 const DeleteItem = require("../usecases/deleteItem");
 
@@ -32,8 +33,9 @@ module.exports = {
                 return res.status(400).json({ message: error.details[0].message });
             }
 
-            if (!req.files) {
-                return res.status(400).json({ message: "Please upload at least 1 image" });
+            if (!req.files || req.files.length === 0) {
+                console.log(req.files);
+                return res.status(400).json({ message: "Please upload image" });
             }
 
             // cek category_id
@@ -65,6 +67,16 @@ module.exports = {
             const readItem = new ReadItem(itemRepository);
             const items = await readItem.execute(filters);
             res.status(200).json(items);
+        } catch (err) {
+            res.status(400).json({ message: err.message });
+        }
+    },
+
+    async readById(req, res) {
+        try {
+            const readItemById = new ReadItemById(itemRepository);
+            const item = await readItemById.execute(req.params.id);
+            res.status(200).json(item);
         } catch (err) {
             res.status(400).json({ message: err.message });
         }
