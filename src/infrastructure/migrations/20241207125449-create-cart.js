@@ -9,13 +9,22 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      user_id: {
+        type: Sequelize.INTEGER
+      },
       item_id: {
         type: Sequelize.INTEGER
       },
       qty: {
         type: Sequelize.INTEGER
       },
+      amount_per_item: {
+        type: Sequelize.FLOAT
+      },
       amount: {
+        type: Sequelize.FLOAT
+      },
+      total: {
         type: Sequelize.FLOAT
       },
       createdAt: {

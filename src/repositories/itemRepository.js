@@ -1,4 +1,4 @@
-const { Item, ImageItem, Category } = require("../infrastructure/models");
+const { Item, ImageItem, Category, Flashsale } = require("../infrastructure/models");
 const { Op } = require("sequelize");
 
 class ItemRepository {
@@ -30,6 +30,11 @@ class ItemRepository {
                 {
                     model: Category,  // Menginclude Category dalam query
                     as: 'category'  // Pastikan alias yang sesuai
+                },
+                {
+                    model: Flashsale,  // Menginclude Flashsale dalam query
+                    as: 'flashsale',  // Pastikan alias yang sesuai
+                    attributes: ['id', 'start_time', 'end_time', 'flash_price'],  // Hanya ambil kolom yang dibutuhkan
                 }
             ]
         });
@@ -45,6 +50,11 @@ class ItemRepository {
             {
                 model: Category,
                 as: 'category'
+            },
+            {
+                model: Flashsale,
+                as: 'flashsale',
+                attributes: ['id', 'start_time', 'end_time', 'flash_price'],  // Hanya ambil kolom yang dibutuhkan
             }
         ] });
     }

@@ -5,10 +5,13 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
 
+const authMiddleware = require("./utils/authMiddleware");
+
 const authRoutes = require("./routes/authRoutes");
 const itemRoutes = require("./routes/itemRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const flashSaleRoutes = require("./routes/flashSaleRoutes");
+const cartRoutes = require("./routes/cartRoutes");
 
 const app = express();
 app.use(cors());
@@ -29,6 +32,7 @@ app.use("/api/auth", authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/flashsales', flashSaleRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use("/api/cart", authMiddleware, cartRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 3000;
