@@ -1,2 +1,4 @@
-uploads/*
+/uploads/*
 .env
+.env.backup
+.env.production
