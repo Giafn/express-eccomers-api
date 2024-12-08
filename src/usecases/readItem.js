@@ -6,6 +6,7 @@ class ReadItem {
     async execute(filters) {
       const { filterBy } = filters;
       let order = [];
+      let take = Math.min(filters.take || 10, 100);
   
       // Tentukan urutan berdasarkan filterBy
       if (filterBy === "date_desc") {
@@ -16,6 +17,8 @@ class ReadItem {
         order = [["price", "ASC"]];
       } else if (filterBy === "price_desc") {
         order = [["price", "DESC"]];
+      } else if (filterBy === "popular") {
+        order = [["points", "DESC"]];
       }
   
       // Tentukan filter berdasarkan harga dan tanggal jika ada
@@ -28,7 +31,7 @@ class ReadItem {
       const categoryId = filters.categoryId;
       const search = filters.search;
   
-      return await this.itemRepository.findAll(where, order, categoryId, search);
+      return await this.itemRepository.findAll(where, order, categoryId, search, take);
     }
   }
   

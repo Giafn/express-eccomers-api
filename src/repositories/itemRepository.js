@@ -9,7 +9,7 @@ class ItemRepository {
         return item;
     }
     
-    async findAll(filters, order, categoryId, search) {
+    async findAll(filters, order, categoryId, search, take) {
         return await Item.findAll({
             where: {
                 ...filters,
@@ -20,6 +20,7 @@ class ItemRepository {
                     }
                 }),
             },
+            limit: take,
             order: order,  // Menggunakan parameter order yang diberikan
             include: [
                 {

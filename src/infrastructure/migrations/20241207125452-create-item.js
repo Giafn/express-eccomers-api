@@ -56,6 +56,10 @@ module.exports = {
       points: {
         type: Sequelize.INTEGER
       },
+      rating: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

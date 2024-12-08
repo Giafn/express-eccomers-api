@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'category_id', // Kolom yang digunakan di Item untuk referensi ke Category
         as: 'category' // Alias yang digunakan saat mengakses kategori terkait
       });
+      Item.hasMany(models.Flashsale, {
+        foreignKey: 'item_id', // Kolom yang digunakan di Flashsale untuk referensi ke Item
+        as: 'flashsale' // Alias yang digunakan saat mengakses flash sale terkait
+      });
     }
   }
   Item.init({
@@ -33,6 +37,8 @@ module.exports = (sequelize, DataTypes) => {
     color: DataTypes.STRING,
     size: DataTypes.STRING,
     model: DataTypes.STRING,
+    points: DataTypes.INTEGER,
+    rating: DataTypes.FLOAT
   }, {
     sequelize,
     modelName: 'Item',

@@ -16,6 +16,18 @@ class FlashSaleRepository {
           [Op.gte]: new Date(),
         },
       },
+      order: [
+        ['end_time', 'ASC'],
+        ['start_time', 'ASC'],
+      ],
+      include: {
+        association: 'item',
+        attributes: ['name', 'price', "rating"],
+        include: {
+          association: 'images',
+          attributes: ['url'],
+        },
+      }
     });
   }
 
