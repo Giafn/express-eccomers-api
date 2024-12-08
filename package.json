@@ -7,6 +7,8 @@
     "dev": "nodemon src/server.js",
     "migrate": "npx sequelize-cli db:migrate --migrations-path=./src/infrastructure/migrations",
     "seed": "npx sequelize-cli db:seed:all --seeders-path=./src/infrastructure/seeders",
+    "create-seed": "npx sequelize-cli seed:generate --seeders-path=./src/infrastructure/seeders --name",
+    "create-migration": "npx sequelize-cli migration:generate --migrations-path=./src/infrastructure/migrations --name",
     "migrate-fresh": "npx sequelize-cli db:migrate:undo:all --migrations-path=./src/infrastructure/migrations && npx sequelize-cli db:migrate --migrations-path=./src/infrastructure/migrations"
   },
   "keywords": [],
