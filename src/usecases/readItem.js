@@ -26,8 +26,9 @@ class ReadItem {
       if (filters.endDate) where.createdAt = { ...where.createdAt, [Op.lte]: filters.endDate };
 
       const categoryId = filters.categoryId;
+      const search = filters.search;
   
-      return await this.itemRepository.findAll(where, order, categoryId);
+      return await this.itemRepository.findAll(where, order, categoryId, search);
     }
   }
   

@@ -9,21 +9,26 @@ class ItemRepository {
         return item;
     }
     
-    async findAll(filters, order, categoryId) {
+    async findAll(filters, order, categoryId, search) {
         return await Item.findAll({
             where: {
                 ...filters,
-                ...(categoryId && { category_id: categoryId })
+                ...(categoryId && { category_id: categoryId }),  // Menyaring berdasarkan category_id jika ada
+                ...(search && { 
+                    name: { 
+                        [Op.like]: `%${search.toLowerCase()}%`  // Pencarian case-insensitive di MySQL menggunakan LIKE
+                    }
+                }),
             },
-            order: order,
+            order: order,  // Menggunakan parameter order yang diberikan
             include: [
                 {
-                model: ImageItem, // Menginclude ImageItem dalam query
-                as: 'images' // Pastikan alias yang sesuai
+                    model: ImageItem,  // Menginclude ImageItem dalam query
+                    as: 'images'  // Pastikan alias yang sesuai
                 },
                 {
-                model: Category, // Menginclude Category dalam query
-                as: 'category' // Pastikan alias yang sesuai
+                    model: Category,  // Menginclude Category dalam query
+                    as: 'category'  // Pastikan alias yang sesuai
                 }
             ]
         });

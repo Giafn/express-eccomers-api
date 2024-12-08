@@ -55,14 +55,15 @@ module.exports = {
     
     async read(req, res) {
         try {
-            const { minPrice, maxPrice, startDate, endDate, filterBy, categoryId} = req.query;
+            const { minPrice, maxPrice, startDate, endDate, filterBy, categoryId, search } = req.query;
             const filters = {
                 minPrice,
                 maxPrice,
                 startDate,
                 endDate,
                 filterBy,
-                categoryId
+                categoryId,
+                search,
             };
             
             const readItem = new ReadItem(itemRepository);
