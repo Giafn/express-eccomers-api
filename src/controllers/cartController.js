@@ -92,11 +92,21 @@ module.exports = {
                     }
                 );
             }
+            for (let i = 0; i < cart.cartItems.length; i++) {
+                let newItem = await itemRepository.findById(cart.cartItems[i].item.id);
+                const flashSale = newItem.flashsale.length > 0 ? newItem.flashsale[0] : null;
+                if (flashSale) {
+                    cart.cartItems[i].item.price = flashSale.flash_price;
+                    cart.cartItems[i].item.name = cart.cartItems[i].item.name + " (Flash Sale)";
+                }
+            } 
 
             return res.json(
                 {
                     "status": "success",
-                    "data": cart
+                    "data": {
+                        "cart": cart,
+                    }
                 }
             );
         } catch (error) {
@@ -178,12 +188,12 @@ module.exports = {
              });
         }
     },
-    // fungsi untuk mendapatkan nominal total harga dari cart item
-    async getTotalPrice(req, res) {
+    async deleteCartItem(req, res) {
         try {
             const userId = req.user.id;
             const cartItemId = req.params.cartItemId;
 
+            // Cek apakah cart item valid
             const cartItem = await cartItemRepository.findById(cartItemId);
             if (!cartItem) {
                 return res.status(404).json(
@@ -213,33 +223,13 @@ module.exports = {
                 );
             }
 
-            const item = await itemRepository.findById(cartItem.item_id);
-            if (!item) {
-                return res.status(404).json(
-                    {
-                        "status": "not_found",
-                        "message": "Item not found"
-                    }
-                );
-            }
-
-            // cek apakah ada flash sale
-            const flashSale = item.flashsale.length > 0 ? item.flashsale[0] : null;
-            if (flashSale) {
-                const now = new Date();
-                item.price = flashSale.flash_price;
-            }
-
-            item.qty = cartItem.qty;
-            item.total_price = item.price * item.qty;
+            // Hapus cart item
+            await cartItemRepository.deleteCartItem(cartItemId);
 
             return res.json(
                 {
                     "status": "success",
-                    "data": {
-                        "total_price": item.total_price,
-                        "is_flash_sale": flashSale ? true : false,
-                    }
+                    "message": "Cart item deleted successfully"
                 }
             );
 
@@ -251,5 +241,4 @@ module.exports = {
              });
         }
     }
-
 };

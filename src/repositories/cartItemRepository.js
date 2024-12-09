@@ -53,6 +53,15 @@ class CartItemRepository {
     async findById(id) {
         return await CartItem.findByPk(id);
     }
+
+    // delete cart item
+    async deleteCartItem(id) {
+        return await CartItem.destroy({
+            where: {
+                id: id,
+            },
+        });
+    }
 }
 
 module.exports = CartItemRepository;

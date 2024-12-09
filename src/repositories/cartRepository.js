@@ -18,7 +18,7 @@ class CartRepository {
             },
             include: {
                 association: "cartItems",
-                attributes: ["qty"],
+                attributes: ["id","qty"],
                 include: {
                     association: "item",
                     attributes: ["id", "name", "price"],
