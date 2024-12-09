@@ -6,7 +6,7 @@ const authenticateToken = (req, res, next) => {
   const token = authHeader && authHeader.split(" ")[1]; // Format: "Bearer TOKEN"
 
   if (!token) {
-    res.status(401).json(
+    return res.status(401).json(
       {
         "status": "unauthenticated",
         "message": "No token provided"
@@ -16,7 +16,7 @@ const authenticateToken = (req, res, next) => {
 
   jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
     if (err) {
-      res.status(403).json(
+      return res.status(403).json(
         {
           "status": "unauthenticated",
           "message": "Token is not valid"
@@ -27,7 +27,7 @@ const authenticateToken = (req, res, next) => {
     let repo = new UserRepository();
     const userExist = await repo.findById(user.id);
     if (!userExist) {
-      res.status(403).json(
+      return res.status(403).json(
         {
           "status": "unauthenticated",
           "message": "Token is not valid"

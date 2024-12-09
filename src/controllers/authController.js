@@ -16,17 +16,17 @@ module.exports = {
 
       const { error } = schema.validate(req.body);
       if (error) {
-        res.status(400).json({ message: error.message });
+        return res.status(400).json({ message: error.message });
       }
 
       const registerUser = new RegisterUser(userRepository);
       const user = await registerUser.execute(req.body);
-      res.status(201).json({
+      return res.status(201).json({
         message: "User registered successfully",
         user,
       });
     } catch (err) {
-      res.status(400).json({ message: err.message });
+      return res.status(400).json({ message: err.message });
     }
   },
 
@@ -36,7 +36,7 @@ module.exports = {
       const { email, password } = req.body;
       const { user, token } = await loginUser.execute({ email, password });
 
-      res.status(200).json({
+      return res.status(200).json({
         message: "Login successful",
         token,
         user: {
@@ -47,7 +47,7 @@ module.exports = {
         },
       });
     } catch (err) {
-      res.status(400).json({ message: err.message });
+      return res.status(400).json({ message: err.message });
     }
   },
 };

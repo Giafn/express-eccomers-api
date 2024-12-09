@@ -46,8 +46,10 @@ class TransactionRepository {
     });
   }
 
-  async delete(id) {
-    return await Transaction.destroy({
+  async updateStatus(id, status) {
+    return await Transaction.update({
+      status: status
+    }, {
       where: {
         id: id
       }

@@ -19,6 +19,9 @@ class CartRepository {
             include: {
                 association: "cartItems",
                 attributes: ["id","qty"],
+                where: {
+                    isHidden: false,
+                },
                 include: {
                     association: "item",
                     attributes: ["id", "name", "price"],

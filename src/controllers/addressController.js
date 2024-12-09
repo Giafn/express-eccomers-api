@@ -18,7 +18,7 @@ module.exports = {
 
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                res.status(400).json({
+                return res.status(400).json({
                     "status": "invalid_request",
                     "message": error.message
                  });
@@ -26,7 +26,7 @@ module.exports = {
 
             const userId = req.user.id;
             if (!userId) {
-                res.status(401).json({ 
+                return res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
@@ -42,7 +42,7 @@ module.exports = {
             const addresses = await addressRepository.getAddressByUserId(userId);
             if (addresses !== null) {
                 if (addresses.length >= 5) {
-                    res.status(400).json({ 
+                    return res.status(400).json({ 
                         "status": "invalid_request",
                         "message": "You have reached the maximum limit of addresses"
                     });
@@ -51,14 +51,14 @@ module.exports = {
             
             const address = new createAddress(addressRepository);
             await address.execute(data);
-            res.status(201).json({ 
+            return res.status(201).json({ 
                 "status": "success",
                 "message": "Address created successfully",
             });
             
         } catch (err) {
             console.log(err);
-            res.status(400).json({ 
+            return res.status(400).json({ 
                 "status": "error",
                 "message": "Failed to create address",
                 'error': err.message
@@ -70,7 +70,7 @@ module.exports = {
             const id = req.params.id;
             const userId = req.user.id;
             if (!userId) {
-                res.status(401).json({ 
+                return res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
@@ -78,26 +78,26 @@ module.exports = {
 
             const addressData = await addressRepository.getAddressById(id);
             if (!addressData) {
-                res.status(404).json({ 
+                return res.status(404).json({ 
                     "status": "not_found",
                     "message": "Address not found"
                  });
             }
 
             if (addressData.user_id !== userId) {
-                res.status(401).json({ 
+                return res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
             }
 
-            res.status(200).json({ 
+            return res.status(200).json({ 
                 "status": "success",
                 "data": addressData
              });
         } catch (err) {
             console.log(err);
-            res.status(400).json({ 
+            return res.status(400).json({ 
                 "status": "error",
                 "message": "Failed to get address",
                 'error': err.message
@@ -108,21 +108,21 @@ module.exports = {
         try {
             const userId = req.user.id;
             if (!userId) {
-                res.status(401).json({ 
+                return res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
             }
 
             const addressData = await addressRepository.getAddressByUserId(userId);
-            res.status(200).json({ 
+            return res.status(200).json({ 
                 "status": "success",
                 "data": addressData
              });
         }
         catch (err) {
             console.log(err);
-            res.status(400).json({ 
+            return res.status(400).json({ 
                 "status": "error",
                 "message": "Failed to get address",
                 'error': err.message
@@ -140,7 +140,7 @@ module.exports = {
 
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                res.status(400).json({
+                return res.status(400).json({
                     "status": "invalid_request",
                     "message": error.message
                  });
@@ -149,7 +149,7 @@ module.exports = {
             const id = req.params.id;
             const userId = req.user.id;
             if (!userId) {
-                res.status(401).json({ 
+                return res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
@@ -157,14 +157,14 @@ module.exports = {
 
             const addressData = await addressRepository.getAddressById(id);
             if (!addressData) {
-                res.status(404).json({ 
+                return res.status(404).json({ 
                     "status": "not_found",
                     "message": "Address not found"
                  });
             }
 
             if (addressData.user_id !== userId) {
-                res.status(401).json({ 
+                return res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
@@ -180,14 +180,14 @@ module.exports = {
 
             const address = new updateAddress(addressRepository);
             await address.execute(data);
-            res.status(200).json({ 
+            return res.status(200).json({ 
                 "status": "success",
                 "message": "Address updated successfully",
             });
             
         } catch (err) {
             console.log(err);
-            res.status(400).json({ 
+            return res.status(400).json({ 
                 "status": "error",
                 "message": "Failed to update address",
                 'error': err.message
@@ -199,7 +199,7 @@ module.exports = {
             const id = req.params.id;
             const userId = req.user.id;
             if (!userId) {
-                res.status(401).json({ 
+                return res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
@@ -207,28 +207,28 @@ module.exports = {
 
             const addressData = await addressRepository.getAddressById(id);
             if (!addressData) {
-                res.status(404).json({ 
+                return res.status(404).json({ 
                     "status": "not_found",
                     "message": "Address not found"
                  });
             }
 
             if (addressData.user_id !== userId) {
-                res.status(401).json({ 
+                return res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
             }
 
             await addressRepository.deleteAddress(id);
-            res.status(200).json({ 
+            return res.status(200).json({ 
                 "status": "success",
                 "message": "Address deleted successfully",
             });
             
         } catch (err) {
             console.log(err);
-            res.status(400).json({ 
+            return res.status(400).json({ 
                 "status": "error",
                 "message": "Failed to delete address",
                 'error': err.message

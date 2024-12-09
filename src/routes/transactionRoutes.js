@@ -9,5 +9,6 @@ const router = express.Router();
 router.post("/", authMiddleware, transactionController.create);
 router.get("/check/:id", authMiddleware, transactionController.checkPaymentStatus);
 router.get("/", authMiddleware, transactionController.getTransaction);
+router.post("/status-update/:id", authMiddleware, transactionController.updateTransactionStatus);
 
 module.exports = router;

@@ -29,7 +29,7 @@ module.exports = {
             const { error } = reqSchema.validate(req.body);
 
             if (error) {
-                res.status(400).json({
+                return res.status(400).json({
                     "status": "error",
                     "message": error.message
                 });
@@ -40,14 +40,14 @@ module.exports = {
             let cartId;
             req.body.items.forEach(async item => {
                 if (item.items_id < 1) {
-                    res.status(400).json({
+                    return res.status(400).json({
                         "status": "error",
                         "message": "items_id must be greater than 0"
                     });
                 }
                 itemCheck = await cartItemRepo.getCartItemByCartItemId(item.items_id);
                 if (!itemCheck) {
-                    res.status(400).json({
+                    return res.status(400).json({
                         "status": "error",
                         "message": "items_id not found"
                     });
@@ -56,7 +56,7 @@ module.exports = {
                 cartId = itemCheck.cart_id;
 
                 if (itemCheck.item.stock < item.qty) {
-                    res.status(400).json({
+                    return res.status(400).json({
                         "status": "error",
                         "message": "stock is not enough"
                     });
@@ -69,7 +69,7 @@ module.exports = {
             const cart = await cartRepo.getCartByUserId(user.id);
 
             if (!cart) {
-                res.status(400).json({
+                return res.status(400).json({
                     "status": "error",
                     "message": "Cart not found"
                 });
@@ -78,7 +78,7 @@ module.exports = {
             console.log(cartId, cart.id);
 
             if (cartId !== cart.id) {
-                res.status(400).json({
+                return res.status(400).json({
                     "status": "error",
                     "message": "Cart not found"
                 });
@@ -132,7 +132,7 @@ module.exports = {
                 await cartItemRepo.deleteCartItemByItemId(item.items_id);
             });
 
-            res.status(201).json({
+            return res.status(201).json({
                 "status": "success",
                 "message": "Transaction created",
                 "data": {
@@ -145,8 +145,7 @@ module.exports = {
 
          
         } catch (err) {
-            console.log(err);
-            res.status(400).json({ 
+            return res.status(400).json({ 
                 "status": "error",
                 "message": "Failed to create transaction",
                 'error': err.message
@@ -160,7 +159,7 @@ module.exports = {
 
             const transaction = await transactionRepo.findById(transactionID);
             if (!transaction) {
-                res.status(404).json({
+                return res.status(404).json({
                     "status": "error",
                     "message": "Transaction not found"
                 });
@@ -171,11 +170,18 @@ module.exports = {
             const result = await checkPaymentStatus(orderId);
             if (result.transaction_status === 'settlement') {
                 await transactionRepo.update(transactionID, {
-                    status: 'paid'
+                    status: 'on process'
                 });
             }
 
-            res.status(200).json({
+            // expired
+            if (result.transaction_status === 'expire') {
+                await transactionRepo.update(transactionID, {
+                    status: 'expired'
+                });
+            }
+
+            return res.status(200).json({
                 "status": "success",
                 "message": "Payment status checked",
                 "data": {
@@ -183,7 +189,7 @@ module.exports = {
                 }
             });
         } catch (err) {
-            res.status(400).json({ 
+            return res.status(400).json({ 
                 "status": "error",
                 "message": "Failed to check payment status",
                 'error': err.message
@@ -195,12 +201,6 @@ module.exports = {
             const user = req.user;
             const transactionRepo = new TransactionRepository();
             const transactions = await transactionRepo.findByUserId(user.id);
-            if (!transactions) {
-                res.status(404).json({
-                    "status": "error",
-                    "message": "Transaction not found"
-                });
-            }
 
             const mappedTransactions = transactions.map((transaction) => {
                 return {
@@ -228,15 +228,77 @@ module.exports = {
             });
             
 
-            res.status(200).json({
+            return res.status(200).json({
                 "status": "success",
                 "data": mappedTransactions
             });
         } catch (err) {
             console.log(err);
-            res.status(400).json({ 
+            return res.status(400).json({ 
                 "status": "error",
                 "message": "Failed to get transaction",
+                'error': err.message
+             });
+        }
+    },
+    async updateTransactionStatus(req, res) {
+        try {
+            const transactionID = req.params.id;
+            // validasi status
+            const reqSchema = Joi.object({
+                status: Joi.string().valid('di kembalikan', 'selesai', 'batal').required()
+            });
+
+            const { error } = reqSchema.validate(req.body);
+            if (error) {
+                return res.status(400).json({
+                    "status": "error",
+                    "message": error.message
+                });
+            }
+
+            const transactionRepo = new TransactionRepository();
+            const transaction = await transactionRepo.findById(transactionID);
+            if (!transaction) {
+                return res.status(404).json({
+                    "status": "error",
+                    "message": "Transaction not found"
+                });
+            }
+
+            const user = req.user;
+            if (transaction.userId !== user.id) {
+                return res.status(403).json({
+                    "status": "error",
+                    "message": "Forbidden"
+                });
+            }
+
+            // kalau pembatalan harus pending kalo dikembalikan dan selesai harus on process
+            if (req.body.status === 'batal' && transaction.status !== 'pending') {
+                return res.status(400).json({
+                    "status": "error",
+                    "message": "Can't cancel transaction that is not pending"
+                });
+            }
+
+            if ((req.body.status === 'di kembalikan' || req.body.status === 'selesai') && transaction.status !== 'on process') {
+                return res.status(400).json({
+                    "status": "error",
+                    "message": "Please Payment first"
+                });
+            }
+
+            await transactionRepo.updateStatus(transactionID, req.body.status);
+
+            return res.status(200).json({
+                "status": "success",
+                "message": "Transaction status updated"
+            });
+        } catch (err) {
+            return res.status(400).json({ 
+                "status": "error",
+                "message": "Failed to update transaction status",
                 'error': err.message
              });
         }

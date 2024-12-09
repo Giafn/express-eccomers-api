@@ -56,6 +56,7 @@ const createQrisInvoice = async (orderId, amount) => {
 const checkPaymentStatus = async (orderId) => {
   try {
     const statusResponse = await midtrans.transaction.status(orderId);
+    console.log("LOG MIDTRANS : ", statusResponse);
     return statusResponse;
   } catch (error) {
     throw new Error(`Error checking payment status: ${error.message}`);

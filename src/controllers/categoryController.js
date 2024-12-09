@@ -8,9 +8,9 @@ module.exports = {
         try {
         const getAllCategory = new GetAllCategory({ categoryRepository });
         const categories = await getAllCategory.execute();
-        res.status(200).json({ categories });
+        return res.status(200).json({ categories });
         } catch (err) {
-        res.status(400).json({ message: err.message });
+        return res.status(400).json({ message: err.message });
         }
     },
 };

@@ -19,29 +19,29 @@ module.exports = {
 
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                res.status(400).json({ message: error.details[0].message });
+                return res.status(400).json({ message: error.details[0].message });
             }
 
             // cek category_id
             const item = await itemRepository.findById(req.body.item_id);
             if (!item) {
-                res.status(404).json({ message: "Item not found" });
+                return res.status(404).json({ message: "Item not found" });
             }
 
             const createFlashSale = new CreateFlashSale(flashSaleRepository);
             const flashSale = await createFlashSale.execute(req.body);
-            res.status(201).json(flashSale);
+            return res.status(201).json(flashSale);
         } catch (err) {
-            res.status(400).json({ message: err.message });
+            return res.status(400).json({ message: err.message });
         }
     },
     
     async readActive(req, res) {
         try {
             const flashSales = await flashSaleRepository.findAllActive();
-            res.status(200).json(flashSales);
+            return res.status(200).json(flashSales);
         } catch (err) {
-            res.status(400).json({ message: err.message });
+            return res.status(400).json({ message: err.message });
         }
     },
 
@@ -49,9 +49,9 @@ module.exports = {
         try {
             const readItemById = new ReadItemById(itemRepository);
             const item = await readItemById.execute(req.params.id);
-            res.status(200).json(item);
+            return res.status(200).json(item);
         } catch (err) {
-            res.status(400).json({ message: err.message });
+            return res.status(400).json({ message: err.message });
         }
     },
     
@@ -59,7 +59,7 @@ module.exports = {
         try {
            
         } catch (err) {
-            res.status(400).json({ message: err.message });
+            return res.status(400).json({ message: err.message });
         }
     },
     
@@ -67,7 +67,7 @@ module.exports = {
         try {
             
         } catch (err) {
-            res.status(400).json({ message: err.message });
+            return res.status(400).json({ message: err.message });
         }
     },
 };

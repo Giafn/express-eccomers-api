@@ -30,25 +30,25 @@ module.exports = {
 
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                res.status(400).json({ message: error.details[0].message });
+                return res.status(400).json({ message: error.details[0].message });
             }
 
             if (!req.files || req.files.length === 0) {
-                res.status(400).json({ message: "Please upload image" });
+                return res.status(400).json({ message: "Please upload image" });
             }
 
             // cek category_id
             const category = await categoryRepository.getById(req.body.category_id);
             if (!category) {
-                res.status(404).json({ message: "Category not found" });
+                return res.status(404).json({ message: "Category not found" });
             }
 
             const createItem = new CreateItem(itemRepository);
             const imageUrls = req.files.map((file) => file.path);
             const item = await createItem.execute(req.body, imageUrls);
-            res.status(201).json({ message: "Item created successfully", item });
+            return res.status(201).json({ message: "Item created successfully", item });
         } catch (err) {
-            res.status(400).json({ message: err.message });
+            return res.status(400).json({ message: err.message });
         }
     },
     
@@ -68,9 +68,9 @@ module.exports = {
             
             const readItem = new ReadItem(itemRepository);
             const items = await readItem.execute(filters);
-            res.status(200).json(items);
+            return res.status(200).json(items);
         } catch (err) {
-            res.status(400).json({ message: err.message });
+            return res.status(400).json({ message: err.message });
         }
     },
 
@@ -78,9 +78,9 @@ module.exports = {
         try {
             const readItemById = new ReadItemById(itemRepository);
             const item = await readItemById.execute(req.params.id);
-            res.status(200).json(item);
+            return res.status(200).json(item);
         } catch (err) {
-            res.status(400).json({ message: err.message });
+            return res.status(400).json({ message: err.message });
         }
     },
     
@@ -103,14 +103,14 @@ module.exports = {
 
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                res.status(400).json({ message: error.details[0].message });
+                return res.status(400).json({ message: error.details[0].message });
             }
 
             
             // cek category_id
             const category = await categoryRepository.getById(req.body.category_id);
             if (!category) {
-                res.status(404).json({ message: "Category not found" });
+                return res.status(404).json({ message: "Category not found" });
             }
             
             const updateItem = new UpdateItem(itemRepository);
@@ -119,9 +119,9 @@ module.exports = {
                 imageUrls = req.files.map((file) => file.path);
             }
             const item = await updateItem.execute(req.params.id, req.body, imageUrls);
-            res.status(200).json({ message: "Item updated successfully", item });
+            return res.status(200).json({ message: "Item updated successfully", item });
         } catch (err) {
-            res.status(400).json({ message: err.message });
+            return res.status(400).json({ message: err.message });
         }
     },
     
@@ -129,9 +129,9 @@ module.exports = {
         try {
             const deleteItem = new DeleteItem(itemRepository);
             await deleteItem.execute(req.params.id);
-            res.status(200).json({ message: "Item deleted successfully" });
+            return res.status(200).json({ message: "Item deleted successfully" });
         } catch (err) {
-            res.status(400).json({ message: err.message });
+            return res.status(400).json({ message: err.message });
         }
     },
 };
