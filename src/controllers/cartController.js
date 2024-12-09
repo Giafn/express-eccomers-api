@@ -1,10 +1,11 @@
 const CartRepository = require('../repositories/cartRepository');
 const CartItemRepository = require('../repositories/cartItemRepository');
 const ItemRepository = require("../repositories/itemRepository");
-const AddToCart = require("../usecases/cart/addToCart");
+
 const UpdateCartItemQty = require("../usecases/cart/updateCartItemQty");
-const Joi = require("joi");
 const updateCartItemQty = require('../usecases/cart/updateCartItemQty');
+const AddToCart = require("../usecases/cart/addToCart");
+const Joi = require("joi");
 
 const cartRepository = new CartRepository();
 const cartItemRepository = new CartItemRepository();
