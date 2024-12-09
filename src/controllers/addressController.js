@@ -1,6 +1,7 @@
 const AddressRepository = require('../repositories/addressRepository');
 
 const updateAddress = require('../usecases/address/updateAddress');
+const createAddress = require('../usecases/address/createAddress');
 
 const addressRepository = new AddressRepository();
 const Joi = require("joi");
@@ -193,4 +194,45 @@ module.exports = {
              });
         }
     },
+    async delete(req, res) {
+        try {
+            const id = req.params.id;
+            const userId = req.user.id;
+            if (!userId) {
+                return res.status(401).json({ 
+                    "status": "unauthorized",
+                    "message": "Unauthorized"
+                 });
+            }
+
+            const addressData = await addressRepository.getAddressById(id);
+            if (!addressData) {
+                return res.status(404).json({ 
+                    "status": "not_found",
+                    "message": "Address not found"
+                 });
+            }
+
+            if (addressData.user_id !== userId) {
+                return res.status(401).json({ 
+                    "status": "unauthorized",
+                    "message": "Unauthorized"
+                 });
+            }
+
+            await addressRepository.deleteAddress(id);
+            res.status(200).json({ 
+                "status": "success",
+                "message": "Address deleted successfully",
+            });
+            
+        } catch (err) {
+            console.log(err);
+            res.status(400).json({ 
+                "status": "error",
+                "message": "Failed to delete address",
+                'error': err.message
+             });
+        }
+    }
 };
