@@ -6,7 +6,7 @@ const authenticateToken = (req, res, next) => {
   const token = authHeader && authHeader.split(" ")[1]; // Format: "Bearer TOKEN"
 
   if (!token) {
-    return res.status(401).json(
+    return res.status(403).json(
       {
         "status": "unauthenticated",
         "message": "No token provided"
@@ -27,6 +27,16 @@ const authenticateToken = (req, res, next) => {
     let repo = new UserRepository();
     const userExist = await repo.findById(user.id);
     if (!userExist) {
+      return res.status(403).json(
+        {
+          "status": "unauthenticated",
+          "message": "Token is not valid"
+        }
+      );
+    }
+
+    // cek email nya sama
+    if (userExist.email !== user.email) {
       return res.status(403).json(
         {
           "status": "unauthenticated",
