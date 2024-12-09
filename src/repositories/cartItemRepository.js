@@ -48,6 +48,11 @@ class CartItemRepository {
             }
         });
     }
+
+    // findById
+    async findById(id) {
+        return await CartItem.findByPk(id);
+    }
 }
 
 module.exports = CartItemRepository;

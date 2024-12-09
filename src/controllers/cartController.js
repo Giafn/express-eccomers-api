@@ -4,6 +4,7 @@ const ItemRepository = require("../repositories/itemRepository");
 const AddToCart = require("../usecases/cart/addToCart");
 const UpdateCartItemQty = require("../usecases/cart/updateCartItemQty");
 const Joi = require("joi");
+const updateCartItemQty = require('../usecases/cart/updateCartItemQty');
 
 const cartRepository = new CartRepository();
 const cartItemRepository = new CartItemRepository();
@@ -105,5 +106,150 @@ module.exports = {
                 "message": "Internal server error"
              });
         }
+    },
+    async updateCartItemQty(req, res) {
+        try {
+            // Validasi request body
+            const reqSchema = Joi.object({
+                cartItemId: Joi.number().required(),
+                qty: Joi.number().min(1).required(),
+            });
+
+            const { error } = reqSchema.validate(req.body);
+            if (error) {
+                return res.status(400).json(
+                    {
+                        "status": "invalid_request",
+                        "message": error.message
+                    }
+                );
+            }
+
+            const userId = req.user.id;
+            const { cartItemId, qty } = req.body;
+
+            // Cek apakah cart item valid
+            const cartItem = await cartItemRepository.findById(cartItemId);
+            if (!cartItem) {
+                return res.status(404).json(
+                    {
+                        "status": "not_found",
+                        "message": "Cart item not found"
+                    }
+                );
+            }
+
+            const cart = await cartRepository.getCartByUserId(userId);
+            if (!cart) {
+                return res.status(404).json(
+                    {
+                        "status": "not_found",
+                        "message": "Cart not found"
+                    }
+                );
+            }
+
+            if (cartItem.cart_id !== cart.id) {
+                return res.status(403).json(
+                    {
+                        "status": "forbidden",
+                        "message": "Forbidden"
+                    }
+                );
+            }
+
+            // Update qty cart item
+            let updateCartItemQty = new UpdateCartItemQty({cartItemRepository});
+            updateCartItemQty = await updateCartItemQty.execute(cartItemId, qty);
+
+            return res.json(
+                {
+                    "status": "success",
+                    "message": "Cart item updated successfully"
+                }
+            );
+            
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ 
+                "status": "internal_error",
+                "message": "Internal server error",
+                "hint": error.message
+             });
+        }
+    },
+    // fungsi untuk mendapatkan nominal total harga dari cart item
+    async getTotalPrice(req, res) {
+        try {
+            const userId = req.user.id;
+            const cartItemId = req.params.cartItemId;
+
+            const cartItem = await cartItemRepository.findById(cartItemId);
+            if (!cartItem) {
+                return res.status(404).json(
+                    {
+                        "status": "not_found",
+                        "message": "Cart item not found"
+                    }
+                );
+            }
+
+            const cart = await cartRepository.getCartByUserId(userId);
+            if (!cart) {
+                return res.status(404).json(
+                    {
+                        "status": "not_found",
+                        "message": "Cart not found"
+                    }
+                );
+            }
+
+            if (cartItem.cart_id !== cart.id) {
+                return res.status(403).json(
+                    {
+                        "status": "forbidden",
+                        "message": "Forbidden"
+                    }
+                );
+            }
+
+            const item = await itemRepository.findById(cartItem.item_id);
+            if (!item) {
+                return res.status(404).json(
+                    {
+                        "status": "not_found",
+                        "message": "Item not found"
+                    }
+                );
+            }
+
+            // cek apakah ada flash sale
+            const flashSale = item.flashsale.length > 0 ? item.flashsale[0] : null;
+            if (flashSale) {
+                const now = new Date();
+                item.price = flashSale.flash_price;
+            }
+
+            item.qty = cartItem.qty;
+            item.total_price = item.price * item.qty;
+
+            return res.json(
+                {
+                    "status": "success",
+                    "data": {
+                        "total_price": item.total_price,
+                        "is_flash_sale": flashSale ? true : false,
+                    }
+                }
+            );
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ 
+                "status": "internal_error",
+                "message": "Internal server error"
+             });
+        }
     }
+
 };
