@@ -54,7 +54,8 @@ module.exports = {
         type: Sequelize.DATE
       },
       points: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        defaultValue: 0
       },
       rating: {
         type: Sequelize.FLOAT,

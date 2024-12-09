@@ -11,6 +11,11 @@ class RegisterUser {
       throw new Error("Email already registered.");
     }
 
+    // cek jika email nya admin@gmail.com
+    if (userData.email === 'admin@gmail.com') {
+      userData.is_admin = true;
+    }
+
     userData.password = await hashPassword(userData.password);
     return await this.userRepository.create(userData);
   }

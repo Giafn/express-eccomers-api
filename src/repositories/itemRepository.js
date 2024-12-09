@@ -72,6 +72,22 @@ class ItemRepository {
     async delete(id) {
         return await Item.destroy({ where: { id } });
     }
+
+    async decrementStock(itemId, qty) {
+        return await Item.decrement('stock', { by: qty, where: { id: itemId } });
+    }
+
+    async incrementPoint(itemId, qty) {
+        return await Item.increment('points', { by: qty, where: { id: itemId } });
+    }
+
+    async incrementCountSold(itemId, qty) {
+        return await Item.increment('count_sold', { by: qty, where: { id: itemId } });
+    }
+
+    async updateRating(itemId, rating) {
+        return await Item.update({ rating }, { where: { id: itemId } });
+    }
 }
 
 module.exports = ItemRepository;

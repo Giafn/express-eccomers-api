@@ -9,6 +9,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      orderID: {
+        type: Sequelize.STRING
+      },
       status: {
         type: Sequelize.STRING
       },
@@ -26,6 +29,9 @@ module.exports = {
       },
       total_amount: {
         type: Sequelize.FLOAT
+      },
+      address: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,

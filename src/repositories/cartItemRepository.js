@@ -28,6 +28,15 @@ class CartItemRepository {
         );
     }
 
+    async getCartItemByCartItemId(cartItemId) {
+        return await CartItem.findByPk(cartItemId, {
+            include: {
+                association: "item",
+                attributes: ["id", "stock"],
+            },
+        });
+    }
+
     // get cart item by cart id and item id
     async getCartItemByCartIdAndItemId(cartId, itemId) {
         return await CartItem.findOne({
@@ -59,6 +68,15 @@ class CartItemRepository {
         return await CartItem.destroy({
             where: {
                 id: id,
+            },
+        });
+    }
+
+    // delete cart by item id
+    async deleteCartItemByItemId(itemId) {
+        return await CartItem.destroy({
+            where: {
+                item_id: itemId,
             },
         });
     }

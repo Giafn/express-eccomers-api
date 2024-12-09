@@ -13,6 +13,7 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const flashSaleRoutes = require("./routes/flashSaleRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const addresRoutes = require("./routes/addressRoutes");
+const transactionRoutes = require("./routes/transactionRoutes");
 
 const app = express();
 app.use(cors());
@@ -35,6 +36,7 @@ app.use('/api/flashsales', flashSaleRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use("/api/cart", authMiddleware, cartRoutes);
 app.use("/api/addresses", authMiddleware, addresRoutes);
+app.use("/api/transactions", authMiddleware, transactionRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 3000;
