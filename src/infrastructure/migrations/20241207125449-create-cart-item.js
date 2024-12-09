@@ -18,6 +18,10 @@ module.exports = {
       qty: {
         type: Sequelize.INTEGER
       },
+      isHidden: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -29,6 +33,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Carts');
+    await queryInterface.dropTable('CartItems');
   }
 };

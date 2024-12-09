@@ -18,7 +18,7 @@ module.exports = {
 
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                return res.status(400).json({
+                res.status(400).json({
                     "status": "invalid_request",
                     "message": error.message
                  });
@@ -26,7 +26,7 @@ module.exports = {
 
             const userId = req.user.id;
             if (!userId) {
-                return res.status(401).json({ 
+                res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
@@ -42,7 +42,7 @@ module.exports = {
             const addresses = await addressRepository.getAddressByUserId(userId);
             if (addresses !== null) {
                 if (addresses.length >= 5) {
-                    return res.status(400).json({ 
+                    res.status(400).json({ 
                         "status": "invalid_request",
                         "message": "You have reached the maximum limit of addresses"
                     });
@@ -70,7 +70,7 @@ module.exports = {
             const id = req.params.id;
             const userId = req.user.id;
             if (!userId) {
-                return res.status(401).json({ 
+                res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
@@ -78,14 +78,14 @@ module.exports = {
 
             const addressData = await addressRepository.getAddressById(id);
             if (!addressData) {
-                return res.status(404).json({ 
+                res.status(404).json({ 
                     "status": "not_found",
                     "message": "Address not found"
                  });
             }
 
             if (addressData.user_id !== userId) {
-                return res.status(401).json({ 
+                res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
@@ -108,7 +108,7 @@ module.exports = {
         try {
             const userId = req.user.id;
             if (!userId) {
-                return res.status(401).json({ 
+                res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
@@ -140,7 +140,7 @@ module.exports = {
 
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                return res.status(400).json({
+                res.status(400).json({
                     "status": "invalid_request",
                     "message": error.message
                  });
@@ -149,7 +149,7 @@ module.exports = {
             const id = req.params.id;
             const userId = req.user.id;
             if (!userId) {
-                return res.status(401).json({ 
+                res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
@@ -157,14 +157,14 @@ module.exports = {
 
             const addressData = await addressRepository.getAddressById(id);
             if (!addressData) {
-                return res.status(404).json({ 
+                res.status(404).json({ 
                     "status": "not_found",
                     "message": "Address not found"
                  });
             }
 
             if (addressData.user_id !== userId) {
-                return res.status(401).json({ 
+                res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
@@ -199,7 +199,7 @@ module.exports = {
             const id = req.params.id;
             const userId = req.user.id;
             if (!userId) {
-                return res.status(401).json({ 
+                res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });
@@ -207,14 +207,14 @@ module.exports = {
 
             const addressData = await addressRepository.getAddressById(id);
             if (!addressData) {
-                return res.status(404).json({ 
+                res.status(404).json({ 
                     "status": "not_found",
                     "message": "Address not found"
                  });
             }
 
             if (addressData.user_id !== userId) {
-                return res.status(401).json({ 
+                res.status(401).json({ 
                     "status": "unauthorized",
                     "message": "Unauthorized"
                  });

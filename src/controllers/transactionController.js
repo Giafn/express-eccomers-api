@@ -95,6 +95,7 @@ module.exports = {
             
             const transaction = await createNewTransaction.execute({
                 status: 'pending',
+                userId: user.id,
                 orderID: orderID,
                 payment_method: 'qr',
                 payment_url: paymentUrl,
@@ -159,7 +160,7 @@ module.exports = {
 
             const transaction = await transactionRepo.findById(transactionID);
             if (!transaction) {
-                return res.status(404).json({
+                res.status(404).json({
                     "status": "error",
                     "message": "Transaction not found"
                 });
@@ -185,6 +186,57 @@ module.exports = {
             res.status(400).json({ 
                 "status": "error",
                 "message": "Failed to check payment status",
+                'error': err.message
+             });
+        }
+    },
+    async getTransaction(req, res) {
+        try {
+            const user = req.user;
+            const transactionRepo = new TransactionRepository();
+            const transactions = await transactionRepo.findByUserId(user.id);
+            if (!transactions) {
+                res.status(404).json({
+                    "status": "error",
+                    "message": "Transaction not found"
+                });
+            }
+
+            const mappedTransactions = transactions.map((transaction) => {
+                return {
+                    transactionId: transaction.id,
+                    status: transaction.status,
+                    orderID: transaction.orderID,
+                    payment: {
+                        method: transaction.payment_method,
+                        url: transaction.payment_url,
+                    },
+                    amountDetails: {
+                        total: transaction.total_amount,
+                        address: transaction.address,
+                    },
+                    items: transaction.transactionItems.map((transactionItem) => {
+                        return {
+                            id: transactionItem.cartItem.item_id,
+                            quantity: transactionItem.qty,
+                            amount: transactionItem.amount,
+                            name: transactionItem.cartItem.item.name,
+                            images: transactionItem.cartItem.item.images.map((image) => image.url),
+                        };
+                    }),
+                };
+            });
+            
+
+            res.status(200).json({
+                "status": "success",
+                "data": mappedTransactions
+            });
+        } catch (err) {
+            console.log(err);
+            res.status(400).json({ 
+                "status": "error",
+                "message": "Failed to get transaction",
                 'error': err.message
              });
         }

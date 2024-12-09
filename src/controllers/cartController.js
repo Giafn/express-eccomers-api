@@ -22,7 +22,7 @@ module.exports = {
 
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                return res.status(400).json(
+                res.status(400).json(
                     {
                         "status": "invalid_request",
                         "message": error.message
@@ -36,7 +36,7 @@ module.exports = {
             // Cek apakah item_id valid
             const item = await itemRepository.findById(item_id);
             if (!item) {
-                return res.status(404).json(
+                res.status(404).json(
                     {
                         "status": "not_found",
                         "message": "Item not found"
@@ -55,7 +55,7 @@ module.exports = {
             if (cartItem) {
                 let updateCartItemQty = new UpdateCartItemQty({cartItemRepository});
                 updateCartItemQty = await updateCartItemQty.execute(cartItem.id, cartItem.qty + qty);
-                return res.json(
+                res.json(
                     {
                         "status": "success",
                         "message": "Item added to cart successfully",
@@ -67,14 +67,14 @@ module.exports = {
             let addToCart = new AddToCart({cartItemRepository});
             addToCart = await addToCart.execute(cart.id, item_id, qty);
 
-            return res.json({ 
+            res.json({ 
                 "status": "success",
                 "message": "Item added to cart successfully",
             });
 
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ 
+            res.status(500).json({ 
                 "status": "internal_error",
                 "message": "Internal server error"
              });
@@ -86,7 +86,7 @@ module.exports = {
             const cart = await cartRepository.getCartByUserId(userId);
 
             if (!cart) {
-                return res.status(404).json(
+                res.status(404).json(
                     {
                         "status": "not_found",
                         "message": "Cart not found"
@@ -102,7 +102,7 @@ module.exports = {
                 }
             } 
 
-            return res.json(
+            res.json(
                 {
                     "status": "success",
                     "data": {
@@ -112,7 +112,7 @@ module.exports = {
             );
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ 
+            res.status(500).json({ 
                 "status": "internal_error",
                 "message": "Internal server error"
              });
@@ -128,7 +128,7 @@ module.exports = {
 
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                return res.status(400).json(
+                res.status(400).json(
                     {
                         "status": "invalid_request",
                         "message": error.message
@@ -142,7 +142,7 @@ module.exports = {
             // Cek apakah cart item valid
             const cartItem = await cartItemRepository.findById(cartItemId);
             if (!cartItem) {
-                return res.status(404).json(
+                res.status(404).json(
                     {
                         "status": "not_found",
                         "message": "Cart item not found"
@@ -152,7 +152,7 @@ module.exports = {
 
             const cart = await cartRepository.getCartByUserId(userId);
             if (!cart) {
-                return res.status(404).json(
+                res.status(404).json(
                     {
                         "status": "not_found",
                         "message": "Cart not found"
@@ -161,7 +161,7 @@ module.exports = {
             }
 
             if (cartItem.cart_id !== cart.id) {
-                return res.status(403).json(
+                res.status(403).json(
                     {
                         "status": "forbidden",
                         "message": "Forbidden"
@@ -173,7 +173,7 @@ module.exports = {
             let updateCartItemQty = new UpdateCartItemQty({cartItemRepository});
             updateCartItemQty = await updateCartItemQty.execute(cartItemId, qty);
 
-            return res.json(
+            res.json(
                 {
                     "status": "success",
                     "message": "Cart item updated successfully"
@@ -182,7 +182,7 @@ module.exports = {
             
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ 
+            res.status(500).json({ 
                 "status": "internal_error",
                 "message": "Internal server error",
                 "hint": error.message
@@ -197,7 +197,7 @@ module.exports = {
             // Cek apakah cart item valid
             const cartItem = await cartItemRepository.findById(cartItemId);
             if (!cartItem) {
-                return res.status(404).json(
+                res.status(404).json(
                     {
                         "status": "not_found",
                         "message": "Cart item not found"
@@ -207,7 +207,7 @@ module.exports = {
 
             const cart = await cartRepository.getCartByUserId(userId);
             if (!cart) {
-                return res.status(404).json(
+                res.status(404).json(
                     {
                         "status": "not_found",
                         "message": "Cart not found"
@@ -216,7 +216,7 @@ module.exports = {
             }
 
             if (cartItem.cart_id !== cart.id) {
-                return res.status(403).json(
+                res.status(403).json(
                     {
                         "status": "forbidden",
                         "message": "Forbidden"
@@ -227,7 +227,7 @@ module.exports = {
             // Hapus cart item
             await cartItemRepository.deleteCartItem(cartItemId);
 
-            return res.json(
+            res.json(
                 {
                     "status": "success",
                     "message": "Cart item deleted successfully"
@@ -236,7 +236,7 @@ module.exports = {
 
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ 
+            res.status(500).json({ 
                 "status": "internal_error",
                 "message": "Internal server error"
              });

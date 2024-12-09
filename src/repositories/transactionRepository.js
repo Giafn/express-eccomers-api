@@ -16,7 +16,24 @@ class TransactionRepository {
   async findByUserId(userId) {
     return await Transaction.findAll({
       where: {
-        user_id: userId
+        userId: userId
+      },
+      attributes: ['id', 'status', 'orderID', 'payment_method', 'payment_url', 'amount', 'address', 'total_amount'],
+      include: {
+        association: 'transactionItems',
+        attributes: ['qty', 'amount', "items_id"],
+        include: {
+          association: 'cartItem',
+          attributes: ['item_id'],
+          include: {
+            association: 'item',
+            attributes: ['name'],
+            include: {
+              association: 'images',
+              attributes: ['url']
+            }
+          }
+        }
       }
     });
   }

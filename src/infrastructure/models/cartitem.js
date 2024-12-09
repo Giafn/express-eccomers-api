@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       cart_id: DataTypes.INTEGER,
       item_id: DataTypes.INTEGER,
       qty: DataTypes.INTEGER,
+      isHidden: DataTypes.BOOLEAN,
     },
     {
       sequelize,

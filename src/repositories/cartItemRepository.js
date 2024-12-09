@@ -22,6 +22,7 @@ class CartItemRepository {
             {
                 where: {
                     id: cartItemId,
+                    isHidden: false,
                 },
                 returning: true,
             }
@@ -34,6 +35,9 @@ class CartItemRepository {
                 association: "item",
                 attributes: ["id", "stock"],
             },
+            where: {
+                isHidden: false,
+            },
         });
     }
 
@@ -42,6 +46,7 @@ class CartItemRepository {
         return await CartItem.findOne({
             where: {
                 [Op.and]: [{ cart_id: cartId }, { item_id: itemId }],
+                isHidden: false,
             },
         });
     }
@@ -50,6 +55,7 @@ class CartItemRepository {
         return await CartItem.findAll({
             where: {
                 cart_id: cartId,
+                isHidden: false,
             },
             include: {
                 association: "item",
@@ -60,7 +66,12 @@ class CartItemRepository {
 
     // findById
     async findById(id) {
-        return await CartItem.findByPk(id);
+        return await CartItem.findOne({
+            where: {
+                id: id,
+                isHidden: false,
+            },
+        });
     }
 
     // delete cart item
@@ -74,11 +85,17 @@ class CartItemRepository {
 
     // delete cart by item id
     async deleteCartItemByItemId(itemId) {
-        return await CartItem.destroy({
-            where: {
-                item_id: itemId,
+        // update isHidden to true
+        return await CartItem.update(
+            {
+                isHidden: true,
             },
-        });
+            {
+                where: {
+                    item_id: itemId,
+                },
+            }
+        );
     }
 }
 

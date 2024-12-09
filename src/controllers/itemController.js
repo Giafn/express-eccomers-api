@@ -30,17 +30,17 @@ module.exports = {
 
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                return res.status(400).json({ message: error.details[0].message });
+                res.status(400).json({ message: error.details[0].message });
             }
 
             if (!req.files || req.files.length === 0) {
-                return res.status(400).json({ message: "Please upload image" });
+                res.status(400).json({ message: "Please upload image" });
             }
 
             // cek category_id
             const category = await categoryRepository.getById(req.body.category_id);
             if (!category) {
-                return res.status(404).json({ message: "Category not found" });
+                res.status(404).json({ message: "Category not found" });
             }
 
             const createItem = new CreateItem(itemRepository);
@@ -103,14 +103,14 @@ module.exports = {
 
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                return res.status(400).json({ message: error.details[0].message });
+                res.status(400).json({ message: error.details[0].message });
             }
 
             
             // cek category_id
             const category = await categoryRepository.getById(req.body.category_id);
             if (!category) {
-                return res.status(404).json({ message: "Category not found" });
+                res.status(404).json({ message: "Category not found" });
             }
             
             const updateItem = new UpdateItem(itemRepository);

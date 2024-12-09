@@ -16,7 +16,7 @@ module.exports = {
 
       const { error } = schema.validate(req.body);
       if (error) {
-        return res.status(400).json({ message: error.message });
+        res.status(400).json({ message: error.message });
       }
 
       const registerUser = new RegisterUser(userRepository);
