@@ -1,10 +1,10 @@
 const ItemRepository = require("../repositories/itemRepository");
 const CategoryRepository = require("../repositories/categoryRepository");
-const CreateItem = require("../usecases/createItem");
-const ReadItem = require("../usecases/readItem");
-const ReadItemById = require("../usecases/readItemById");
-const UpdateItem = require("../usecases/updateItem");
-const DeleteItem = require("../usecases/deleteItem");
+const CreateItem = require("../usecases/item/createItem");
+const ReadItem = require("../usecases/item/readItem");
+const ReadItemById = require("../usecases/item/readItemById");
+const UpdateItem = require("../usecases/item/updateItem");
+const DeleteItem = require("../usecases/item/deleteItem");
 
 const itemRepository = new ItemRepository();
 const categoryRepository = new CategoryRepository();
@@ -34,7 +34,6 @@ module.exports = {
             }
 
             if (!req.files || req.files.length === 0) {
-                console.log(req.files);
                 return res.status(400).json({ message: "Please upload image" });
             }
 

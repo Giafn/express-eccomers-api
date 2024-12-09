@@ -1,5 +1,5 @@
 const CategoryRepository = require("../repositories/categoryRepository");
-const GetAllCategory = require("../usecases/getAllCategory");
+const GetAllCategory = require("../usecases/category/getAllCategory");
 
 const categoryRepository = new CategoryRepository();
 

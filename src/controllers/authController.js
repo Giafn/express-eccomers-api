@@ -1,6 +1,6 @@
 const UserRepository = require("../repositories/userRepository");
-const RegisterUser = require("../usecases/registerUser");
-const LoginUser = require("../usecases/loginUser");
+const RegisterUser = require("../usecases/user/registerUser");
+const LoginUser = require("../usecases/user/loginUser");
 
 const userRepository = new UserRepository();
 const joi = require("joi");
@@ -18,8 +18,6 @@ module.exports = {
       if (error) {
         return res.status(400).json({ message: error.message });
       }
-      
-      console.log(req.body);
 
       const registerUser = new RegisterUser(userRepository);
       const user = await registerUser.execute(req.body);

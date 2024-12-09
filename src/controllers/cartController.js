@@ -1,13 +1,16 @@
 const CartRepository = require('../repositories/cartRepository');
+const CartItemRepository = require('../repositories/cartItemRepository');
 const ItemRepository = require("../repositories/itemRepository");
-const AddCart = require("../usecases/addCart");
+const AddToCart = require("../usecases/cart/addToCart");
+const UpdateCartItemQty = require("../usecases/cart/updateCartItemQty");
 const Joi = require("joi");
 
 const cartRepository = new CartRepository();
+const cartItemRepository = new CartItemRepository();
 const itemRepository = new ItemRepository();
 
 module.exports = {
-    async create(req, res) {
+    async addToCart(req, res) {
         try {
             // Validasi request body
             const reqSchema = Joi.object({
@@ -17,50 +20,90 @@ module.exports = {
 
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                return res.status(400).json({ message: error.details[0].message });
-            }
-
-            // Cek item_id dan ambil data item termasuk flash sale
-            const item = await itemRepository.findById(req.body.item_id, { include: ['flashsale'] });
-            if (!item) {
-                return res.status(404).json({ message: "Item not found" });
-            }
-
-            // Cek stok item
-            if (item.stock < req.body.qty) {
-                return res.status(400).json({ message: "Item out of stock" });
-            }
-
-            // Hitung harga berdasarkan flash sale jika ada
-            let harga = item.price; // Harga default adalah harga normal
-            const now = new Date();
-
-            // Periksa apakah ada flash sale yang berlaku
-            if (item.flashsale && Array.isArray(item.flashsale) && item.flashsale.length > 0) {
-                const flashSale = item.flashsale.find(
-                    (sale) => now >= new Date(sale.start_time) && now <= new Date(sale.end_time)
+                return res.status(400).json(
+                    {
+                        "status": "invalid_request",
+                        "message": error.message
+                    }
                 );
-
-                if (flashSale) {
-                    harga = flashSale.flash_price; // Gunakan harga flash sale
-                }
             }
 
-            // Simpan item ke keranjang
-            const createCart = new AddCart({ cartRepository });
-            const cartItem = await createCart.execute({
-                userId: req.user.id,
-                itemId: req.body.item_id,
-                qty: req.body.qty,
-                amount_per_item: harga,
-                amount: harga * req.body.qty,
-                total: harga * req.body.qty,
+            const userId = req.user.id;
+            const { item_id, qty } = req.body;
+
+            // Cek apakah item_id valid
+            const item = await itemRepository.findById(item_id);
+            if (!item) {
+                return res.status(404).json(
+                    {
+                        "status": "not_found",
+                        "message": "Item not found"
+                    }
+                );
+            }
+
+            // cek jika cart belum ada, maka buat cart baru
+            let cart = await cartRepository.getCartByUserId(userId);
+            if (!cart) {
+                cart = await cartRepository.createCart(userId);
+            }
+
+            // cek jika item sudah ada di cart
+            const cartItem = await cartItemRepository.getCartItemByCartIdAndItemId(cart.id, item_id);
+            if (cartItem) {
+                let updateCartItemQty = new UpdateCartItemQty({cartItemRepository});
+                updateCartItemQty = await updateCartItemQty.execute(cartItem.id, cartItem.qty + qty);
+                return res.json(
+                    {
+                        "status": "success",
+                        "message": "Item added to cart successfully",
+                    }
+                );
+            }
+
+            // Tambahkan item ke cart
+            let addToCart = new AddToCart({cartItemRepository});
+            addToCart = await addToCart.execute(cart.id, item_id, qty);
+
+            return res.json({ 
+                "status": "success",
+                "message": "Item added to cart successfully",
             });
 
-            return res.status(201).json(cartItem);
-        } catch (err) {
-            console.error(err); // Debugging error
-            return res.status(500).json({ message: "Internal server error" });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ 
+                "status": "internal_error",
+                "message": "Internal server error"
+             });
         }
     },
+    async getCart(req, res) {
+        try {
+            const userId = req.user.id;
+            const cart = await cartRepository.getCartByUserId(userId);
+
+            if (!cart) {
+                return res.status(404).json(
+                    {
+                        "status": "not_found",
+                        "message": "Cart not found"
+                    }
+                );
+            }
+
+            return res.json(
+                {
+                    "status": "success",
+                    "data": cart
+                }
+            );
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ 
+                "status": "internal_error",
+                "message": "Internal server error"
+             });
+        }
+    }
 };

@@ -1,6 +1,6 @@
 const FlashSaleRepository = require('../repositories/flashSaleRepository');
 const ItemRepository = require("../repositories/itemRepository");
-const CreateFlashSale = require("../usecases/createFlashSale");
+const CreateFlashSale = require("../usecases/flashsale/createFlashSale");
 
 const flashSaleRepository = new FlashSaleRepository();
 const itemRepository = new ItemRepository();

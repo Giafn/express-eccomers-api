@@ -62,7 +62,6 @@ class ItemRepository {
     async update(id, updateData, imageUrls) {
         await Item.update(updateData, { where: { id } });
         if (imageUrls !== null && imageUrls.length > 0) {
-            console.log("anak bai" + imageUrls);
             await ImageItem.destroy({ where: { item_id: id } });
             const images = imageUrls.map((url) => ({ item_id: id, url }));
             await ImageItem.bulkCreate(images);

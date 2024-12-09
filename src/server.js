@@ -18,13 +18,13 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // log request
-app.use((req, res, next) => {
-    console.log("Headers:", req.headers);
-    console.log("Body:", req.body);
-    console.log("Params:", req.params);
-    console.log("Query:", req.query);
-    next();
-});
+// app.use((req, res, next) => {
+//     console.log("Headers:", req.headers);
+//     console.log("Body:", req.body);
+//     console.log("Params:", req.params);
+//     console.log("Query:", req.query);
+//     next();
+// });
 
 
 app.use("/api/items", itemRoutes);

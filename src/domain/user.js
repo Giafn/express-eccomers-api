@@ -4,7 +4,6 @@ class User {
       this.name = name;
       this.email = email;
       this.password = password;
-      this.address = address;
       this.telp_number = telp_number;
       this.is_admin = is_admin;
     }

@@ -1,4 +1,4 @@
-const { hashPassword } = require("../utils/hashHelper");
+const { hashPassword } = require("../../utils/hashHelper");
 
 class RegisterUser {
   constructor(userRepository) {

@@ -1,5 +1,5 @@
-const { comparePassword } = require("../utils/hashHelper");
-const { generateToken } = require("../utils/jwtHelper");
+const { comparePassword } = require("../../utils/hashHelper");
+const { generateToken } = require("../../utils/jwtHelper");
 
 class LoginUser {
   constructor(userRepository) {
