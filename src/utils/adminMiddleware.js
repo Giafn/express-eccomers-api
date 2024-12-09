@@ -35,6 +35,15 @@ const authenticateToken = (req, res, next) => {
       );
     }
 
+    if (!user.is_admin) {
+      return res.status(403).json(
+        {
+          "status": "forbidden",
+          "message": "You are not allowed to access this resource"
+        }
+      );
+    }
+
 
     req.user = user; // Simpan data user dari token ke `req.user`
     next(); // Lanjut ke handler berikutnya
