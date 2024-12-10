@@ -24,8 +24,9 @@ class UserRepository {
   }
 
   async delete(id) {
+    // update is_deleted menjadi true
     const user = await User.findByPk(id);
-    return await user.destroy();
+    return await user.update({ is_deleted: true });
   }
 }
 

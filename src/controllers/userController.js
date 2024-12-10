@@ -5,6 +5,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 
+
 // Set up multer storage configuration
 const storage = multer.memoryStorage(); // store file in memory
 const upload = multer({ storage }).single("image");
@@ -158,6 +159,90 @@ module.exports = {
 
       await userRepository.delete(req.user.id);
       return res.status(200).json({ message: 'User deleted' });
+    } catch (err) {
+      return res.status(400).json({ message: err.message });
+    }
+  },
+
+  // reset password function menerima email , otp, password baru
+  async resetPassword(req, res) {
+    try {
+      const schema = joi.object({
+        email: joi.string().email().required(),
+        otp: joi.string().required(),
+        new_password: joi.string().min(6).required(),
+      });
+
+      const { error } = schema.validate(req.body);
+      if (error) {
+        return res.status(400).json({ message: error.message });
+      }
+
+      // cek apakah email ada di database
+      const user = await userRepository.findByEmail(req.body.email);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // cek apakah otp valid
+      const env_otp = process.env.OTP;
+      if (env_otp !== req.body.otp) {
+        return res.status(400).json({ message: 'Invalid OTP' });
+      }
+
+      // hash password baru
+      const hashedPassword = await hashPassword(req.body.new_password);
+      await userRepository.updatePassword(user.id, hashedPassword);
+
+      return res.status(200).json({ message: 'Password updated' });
+    } catch (err) {
+      return res.status(400).json({ message: err.message });
+    }
+  },
+
+  // cek otp
+  async cekOtp(req, res) {
+    try {
+      const schema = joi.object({
+        otp: joi.string().required()
+      });
+
+      const { error } = schema.validate(req.body);
+      if (error) {
+        return res.status(400).json({ message: error.message });
+      }
+      
+      // cek apakah otp valid
+      const env_otp = process.env.OTP;
+      if (env_otp !== req.body.otp) {
+        return res.status(400).json({ message: 'Invalid OTP' });
+      }
+
+      return res.status(200).json({ message: 'OTP valid' });
+    } catch (err) {
+      return res.status(400).json({ message: err.message });
+    }
+  },
+
+  // cek email
+  async cekEmail(req, res) {
+    try {
+      const schema = joi.object({
+        email: joi.string().email().required()
+      });
+
+      const { error } = schema.validate(req.body);
+      if (error) {
+        return res.status(400).json({ message: error.message });
+      }
+
+      // cek apakah email ada di database
+      const user = await userRepository.findByEmail(req.body.email);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      return res.status(200).json({ message: 'Email valid' });
     } catch (err) {
       return res.status(400).json({ message: err.message });
     }

@@ -92,6 +92,16 @@ module.exports = {
         );
       }
 
+      // cek jika user is deleted
+      if (userExist.is_deleted) {
+        return res.status(403).json(
+          {
+            "status": "unauthenticated",
+            "message": "User has been deleted."
+          }
+        );
+      }
+
       // cek email nya sama
       if (userExist.email !== user.email) {
         return res.status(403).json(

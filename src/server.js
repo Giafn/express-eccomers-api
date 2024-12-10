@@ -33,7 +33,7 @@ app.use("/api/addresses", authMiddleware, addresRoutes);
 app.use("/api/transactions", authMiddleware, transactionRoutes);
 app.use("/api/royalties", authMiddleware, royaltiRoutes);
 app.use("/api/vouchers", authMiddleware, voucherRoutes);
-app.use("/api/users", authMiddleware, userRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/ratings", authMiddleware, ratingRoutes);
 
 // Start Server

@@ -17,6 +17,11 @@ class LoginUser {
       throw new Error("Invalid credentials.");
     }
 
+    // cek jika user is deleted
+    if (user.is_deleted) {
+      throw new Error("User has been deleted.");
+    }
+
     const token = generateToken({
       id: user.id,
       email: user.email,
