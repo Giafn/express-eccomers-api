@@ -21,7 +21,13 @@ module.exports = {
       }
 
       const registerUser = new RegisterUser(userRepository);
-      const user = await registerUser.execute(req.body);
+      const data = {
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        telp_number: "-",
+      };
+      const user = await registerUser.execute(data);
       return res.status(201).json({
         message: "User registered successfully",
         user,

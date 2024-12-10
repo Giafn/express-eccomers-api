@@ -17,6 +17,7 @@ class RegisterUser {
     }
 
     userData.password = await hashPassword(userData.password);
+    userData.telp_number = "-";
     return await this.userRepository.create(userData);
   }
 }

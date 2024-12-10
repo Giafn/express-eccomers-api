@@ -10,13 +10,13 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // Transaction.belongsTo(models.Voucher, {
-      //   foreignKey: 'voucher_id',
-      //   as: 'voucher'
-      // });
       Transaction.hasMany(models.TransactionItem, {
         foreignKey: 'transaction_id',
         as: 'transactionItems'
+      });
+      Transaction.belongsTo(models.User, {
+        foreignKey: 'userId',
+        as: 'user'
       });
     }
   }

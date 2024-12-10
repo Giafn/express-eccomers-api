@@ -372,5 +372,87 @@ module.exports = {
                 'error': err.message
              });
         }
+    },
+
+    async getAllTransaction(req, res) {
+        try {
+
+            // cek start_date end_date di req.query
+            // validasi
+            console.log(req.query);
+            if (req.query.start_date !== '' || req.query.end_date !== '') {
+                const reqSchema = Joi.object({
+                    start_date: Joi.date().required(),
+                    end_date: Joi.date().required()
+                });
+
+                const { error } = reqSchema.validate(req.query);
+                if (error) {
+                    return res.status(400).json({
+                        "status": "error",
+                        "message": error.message
+                    });
+                }
+            }
+
+            const user = req.user;
+            const transactionRepo = new TransactionRepository();
+            const transactions = await transactionRepo.getAll(req.query.start_date, req.query.end_date);
+
+            let total = 0;
+            let countOnProcess = 0;
+            let countSelesai = 0;
+            let countBatal = 0;
+            let countDiKembalikan = 0;
+            const mappedTransactions = transactions.map((transaction) => {
+                // nama item di pisah koma
+                if (transaction.status === 'on process') {
+                    countOnProcess++;
+                }
+                if (transaction.status === 'selesai') {
+                    total += transaction.total_amount;
+                    countSelesai++;
+                }
+                if (transaction.status === 'batal') {
+                    countBatal++;
+                }
+                if (transaction.status === 'di kembalikan') {
+                    countDiKembalikan++;
+                }
+                const itemNames = transaction.transactionItems.map((transactionItem) => transactionItem.cartItem.item.name).join(', ');
+                return {
+                    transactionId: transaction.id,
+                    status: transaction.status,
+                    orderID: transaction.orderID,
+                    item_name: itemNames,
+                    total: transaction.total_amount,
+                    nama_user: transaction.user.name,
+                    date: transaction.createdAt,
+                };
+            });
+
+
+            return res.status(200).json({
+                "status": "success",
+                "data": {
+                    "status_count" : {
+                        "on process": countOnProcess,
+                        "selesai": countSelesai,
+                        "batal": countBatal,
+                        "di kembalikan": countDiKembalikan
+                    },
+                    "total": total,
+                    "transactions": mappedTransactions
+                }
+            });
+
+        } catch (err) {
+            console.log(err);
+            return res.status(400).json({ 
+                "status": "error",
+                "message": "Failed to get transaction",
+                'error': err.message
+             });
+        }
     }
 };
