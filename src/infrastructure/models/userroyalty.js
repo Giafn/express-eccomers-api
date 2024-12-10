@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   UserRoyalty.init({
     user_id: DataTypes.INTEGER,
-    level: DataTypes.STRING,
+    level: DataTypes.INTEGER,
     point: DataTypes.INTEGER
   }, {
     sequelize,

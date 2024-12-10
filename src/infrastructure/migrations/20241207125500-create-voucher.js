@@ -9,6 +9,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      royalty_level: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+      },
       name: {
         type: Sequelize.STRING
       },
@@ -18,8 +22,15 @@ module.exports = {
       min_expense: {
         type: Sequelize.FLOAT
       },
+      type: {
+        type: Sequelize.ENUM('persen', 'nominal', 'ongkir')
+      },
       disc: {
         type: Sequelize.FLOAT
+      },
+      code: {
+        type: Sequelize.STRING,
+        unique: true
       },
       createdAt: {
         allowNull: false,

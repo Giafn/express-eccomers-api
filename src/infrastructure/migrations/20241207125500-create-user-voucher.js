@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('UserRoyalties', {
+    await queryInterface.createTable('UserVouchers', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -12,11 +12,10 @@ module.exports = {
       user_id: {
         type: Sequelize.INTEGER
       },
-      level: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0
+      voucher_id: {
+        type: Sequelize.INTEGER
       },
-      point: {
+      remaining: {
         type: Sequelize.INTEGER
       },
       createdAt: {
@@ -30,6 +29,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UserRoyalties');
+    await queryInterface.dropTable('UserVouchers');
   }
 };

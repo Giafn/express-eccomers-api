@@ -14,20 +14,11 @@ const flashSaleRoutes = require("./routes/flashSaleRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const addresRoutes = require("./routes/addressRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
+const royaltiRoutes = require("./routes/royaltyRoutes");
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-
-// log request
-// app.use((req, res, next) => {
-//     console.log("Headers:", req.headers);
-//     console.log("Body:", req.body);
-//     console.log("Params:", req.params);
-//     console.log("Query:", req.query);
-//     next();
-// });
-
 
 app.use("/api/items", itemRoutes);
 app.use("/api/auth", authRoutes);
@@ -37,6 +28,8 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use("/api/cart", authMiddleware, cartRoutes);
 app.use("/api/addresses", authMiddleware, addresRoutes);
 app.use("/api/transactions", authMiddleware, transactionRoutes);
+app.use("/api/royalties", authMiddleware, royaltiRoutes);
+
 
 // Start Server
 const PORT = process.env.PORT || 3000;

@@ -3,6 +3,7 @@ const TransactionItemRepository = require('../repositories/transactionItemReposi
 const cartRepository = require('../repositories/cartRepository');
 const cartItemRepository = require('../repositories/cartItemRepository');
 const itemRepository = require('../repositories/itemRepository');
+const userRoyaltyRepository = require('../repositories/userRoyaltyRepository');
 
 const createTransaction = require('../usecases/transaction/createTransaction');
 const createTransactionItems = require('../usecases/transaction/createTransactionItems');
@@ -152,6 +153,7 @@ module.exports = {
              });
         }
     },
+
     async checkPaymentStatus(req, res) {
         try {
             const transactionID = req.params.id;
@@ -169,6 +171,35 @@ module.exports = {
 
             const result = await checkPaymentStatus(orderId);
             if (result.transaction_status === 'settlement') {
+
+                // cek jika userLoyalty sudah ada
+                const userRoyaltyRepo = new userRoyaltyRepository();
+                const userRoyalty = await userRoyaltyRepo.getUserRoyalty(transaction.userId);
+                if (!userRoyalty) {
+                    await userRoyaltyRepo.create({
+                        user_id: transaction.userId,
+                        level: 0,
+                        point: 1
+                    });
+                } else {
+                    
+                    // 3-6 = level 1 7-14 = level 2 >=15 = level 3
+
+                    let level = 0;
+                    if (userRoyalty.point >= 15) {
+                        level = 3;
+                    } else if (userRoyalty.point >= 7) {
+                        level = 2;
+                    } else if (userRoyalty.point >= 3) {
+                        level = 1;
+                    }
+                    await userRoyaltyRepo.update({
+                        user_id: transaction.userId,
+                        point: userRoyalty.point + 1,
+                        level: level
+                    });
+                }
+
                 await transactionRepo.update(transactionID, {
                     status: 'on process'
                 });
@@ -196,6 +227,7 @@ module.exports = {
              });
         }
     },
+
     async getTransaction(req, res) {
         try {
             const user = req.user;
@@ -241,6 +273,7 @@ module.exports = {
              });
         }
     },
+
     async updateTransactionStatus(req, res) {
         try {
             const transactionID = req.params.id;
