@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post("/", ratingController.addrating);
 router.get("/", ratingController.getAllRatings);
-router.get("/get/:itemId", ratingController.getRatingByItemId);
+router.post("/get/:itemId", ratingController.getRatingByItemId);
 router.get("/buyed-item", ratingController.getItemHasBuyed);
 
 

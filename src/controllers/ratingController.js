@@ -19,80 +19,88 @@ module.exports = {
                 rating: Joi.number().min(1).max(5).required(),
                 desc: Joi.string(),
             });
-
+    
             const { error } = reqSchema.validate(req.body);
             if (error) {
-                return res.status(400).json(
-                    {
-                        "status": "invalid_request",
-                        "message": error.message
-                    }
-                );
+                return res.status(400).json({
+                    status: "invalid_request",
+                    message: error.message,
+                });
             }
-
+    
             const userId = req.user.id;
             const { item_id, rating, desc } = req.body;
-
+    
             // Cek apakah item valid
             const item = await itemRepository.findById(item_id);
             if (!item) {
-                return res.status(404).json(
-                    {
-                        "status": "not_found",
-                        "message": "Item not found"
-                    }
-                );
+                return res.status(404).json({
+                    status: "not_found",
+                    message: "Item not found",
+                });
             }
-
-            // Hitung rata-rata rating
-            const ratings = await ratingRepository.getRatingByItemId(item_id);
-            let totalRating = 0;
-            ratings.forEach(rating => {
-                totalRating += rating.rating;
-            });
-            const ratraRataRating = (totalRating + rating) / (ratings.length + 1);
-            
-            // update item rating
-            await itemRepository.updateRating(item_id, ratraRataRating);
-
-            // Cek apakah user sudah pernah memberikan rating
+    
+            // Cek apakah user sudah memberikan rating untuk item ini
             const existingRating = await ratingRepository.getRatingByItemIdAndUserId(item_id, userId);
             if (existingRating) {
-                return res.status(400).json(
-                    {
-                        "status": "bad_request",
-                        "message": "You have already rated this item"
-                    }
-                );
+                return res.status(400).json({
+                    status: "bad_request",
+                    message: "You have already rated this item",
+                });
             }
-
-            // Tambahkan rating
+    
+            // Tambahkan rating baru
             const newRating = await ratingRepository.createRating({
                 item_id,
                 user_id: userId,
                 rating,
                 desc,
             });
-
-            return res.json(
-                {
-                    "status": "success",
-                    "data": newRating
-                }
-            );
-
-
+    
+            // Ambil semua rating untuk item ini setelah menambahkan yang baru
+            const ratings = await ratingRepository.getRatingByItemId(item_id);
+    
+            // Hitung rata-rata rating terbaru
+            const totalRating = ratings.reduce((sum, r) => sum + r.rating, 0);
+            const rataRataRating = ratings.length > 0 ? totalRating / ratings.length : rating;
+    
+            // Perbarui rata-rata rating di item
+            await itemRepository.updateRating(item_id, rataRataRating);
+    
+            return res.json({
+                status: "success",
+                data: newRating,
+            });
+    
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ 
-                "status": "internal_error",
-                "message": "Internal server error"
-             });
+            return res.status(500).json({
+                status: "internal_error",
+                message: "Internal server error",
+            });
         }
     },
+    
 
     async getRatingByItemId(req, res) {
         try {
+
+            // menerima custom rating
+            if (req.body.rating) {
+                const reqSchema = Joi.object({
+                    rating: Joi.number().min(1).max(5),
+                });
+                const { error } = reqSchema.validate(req.body);
+                if (error) {
+                    return res.status(400).json(
+                        {
+                            "status": "invalid_request",
+                            "message": error.message
+                        }
+                    );
+                }
+            }
+
             const itemId = req.params.itemId;
 
             const item = await itemRepository.findById(itemId);
@@ -105,7 +113,21 @@ module.exports = {
                 );
             }
 
-            const ratings = await ratingRepository.getRatingByItemId(itemId);
+            // cek jika ada rating custom
+            let ratings = [];
+            const allRatings = await ratingRepository.getRatingByItemId(itemId);
+            if (req.body.rating) {
+                const rating = parseInt(req.body.rating);
+                ratings = await ratingRepository.getRatingByItemIdFilterRating(itemId, rating);
+            } else {
+                ratings = allRatings;
+            }
+
+
+            const countRatingPerStar = [0, 0, 0, 0, 0];
+            allRatings.forEach(rating => {
+                countRatingPerStar[Math.floor(rating.rating) - 1]++;
+            });
 
             const mappedRatings = ratings.map(rating => {
                 let profileImage = "http://localhost:3000/uploads/profile_" + rating.user.id + ".png";
@@ -114,7 +136,7 @@ module.exports = {
                     profileImage = "http://localhost:3000/uploads/profile_" + rating.user.id + ".jpg";
                     if (!fs.existsSync(path.join(__dirname, '../../uploads/profile_' + rating.user.id + '.jpg'))) {
                     profileImage = "http://localhost:3000/uploads/profile_" + rating.user.id + ".jpeg";
-                    if (!fs.existsSync(path.join(__dirname, '../../uploads/profile_' + ating.user.id + '.jpeg'))) {
+                    if (!fs.existsSync(path.join(__dirname, '../../uploads/profile_' + rating.user.id + '.jpeg'))) {
                         profileImage = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
                     }
                     }       
@@ -132,6 +154,14 @@ module.exports = {
                 {
                     "status": "success",
                     "data": {
+                        "rating_count": {
+                            "1": countRatingPerStar[0],
+                            "2": countRatingPerStar[1],
+                            "3": countRatingPerStar[2],
+                            "4": countRatingPerStar[3],
+                            "5": countRatingPerStar[4]
+                        },
+                        "item_rating": item.rating + "/5",
                         "ratings": mappedRatings
                     }
                 }

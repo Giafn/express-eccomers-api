@@ -17,6 +17,19 @@ class RatingRepository {
     });
   }
 
+  async getRatingByItemIdFilterRating(itemId, rating) {
+    return Rating.findAll({
+      where: {
+        item_id: itemId,
+        rating: rating,
+      },
+      include: {
+        association: "user",
+        attributes: ["id", "name", "email"],
+      },
+    });
+  }
+
   async getAllRatings() {
     return Rating.findAll({
       include: [
