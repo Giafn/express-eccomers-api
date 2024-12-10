@@ -99,6 +99,27 @@ class CartItemRepository {
             }
         );
     }
+
+    // get hidden cart item by user id
+    async getHiddenCartItemByUserId(userId) {
+        return await CartItem.findAll({
+            where: {
+                isHidden: true,
+            },
+            attributes: ["id", "item_id"],
+            include: {
+                association: "cart",
+                where: {
+                    user_id: userId,
+                },
+                attributes: [],
+            },
+            include: {
+                association: "item",
+                attributes: ["name"],
+            },
+        });
+    }
 }
 
 module.exports = CartItemRepository;

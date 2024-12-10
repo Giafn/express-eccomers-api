@@ -17,6 +17,7 @@ const transactionRoutes = require("./routes/transactionRoutes");
 const royaltiRoutes = require("./routes/royaltyRoutes");
 const voucherRoutes = require("./routes/voucherRoutes");
 const userRoutes = require("./routes/userRoutes");
+const ratingRoutes = require("./routes/ratingRoutes");
 
 const app = express();
 app.use(cors());
@@ -33,6 +34,7 @@ app.use("/api/transactions", authMiddleware, transactionRoutes);
 app.use("/api/royalties", authMiddleware, royaltiRoutes);
 app.use("/api/vouchers", authMiddleware, voucherRoutes);
 app.use("/api/users", authMiddleware, userRoutes);
+app.use("/api/ratings", authMiddleware, ratingRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 3000;

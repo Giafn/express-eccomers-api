@@ -10,10 +10,18 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Rating.belongsTo(models.Item, {
+        foreignKey: 'item_id',
+        as: 'item',
+      });
+      Rating.belongsTo(models.User, {
+        foreignKey: 'user_id',
+        as: 'user',
+      });
     }
   }
   Rating.init({
+    item_id: DataTypes.INTEGER,
     user_id: DataTypes.INTEGER,
     rating: DataTypes.FLOAT,
     desc: DataTypes.STRING
