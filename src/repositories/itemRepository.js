@@ -42,22 +42,38 @@ class ItemRepository {
     
     
     async findById(id) {
-        return await Item.findByPk(id, { include: [
-            {
-                model: ImageItem,
-                as: 'images'
-            },
-            {
-                model: Category,
-                as: 'category'
-            },
-            {
-                model: Flashsale,
-                as: 'flashsale',
-                attributes: ['id', 'start_time', 'end_time', 'flash_price'],  // Hanya ambil kolom yang dibutuhkan
-            }
-        ] });
+        const moment = require("moment-timezone");
+
+        const nowInJakarta = moment().tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss");
+        console.log("NOW IN JAKARTA", nowInJakarta);
+        return await Item.findByPk(id, {
+            include: [
+                {
+                    model: ImageItem,
+                    as: 'images',
+                },
+                {
+                    model: Category,
+                    as: 'category',
+                },
+                {
+                    model: Flashsale,
+                    as: 'flashsale',
+                    attributes: ['id', 'start_time', 'end_time', 'flash_price'], // Hanya ambil kolom yang dibutuhkan
+                    required: false, // Menjadikan relasi ini opsional
+                    where: {
+                        start_time: {
+                            [Op.lte]: nowInJakarta,
+                        },
+                        end_time: {
+                            [Op.gte]: nowInJakarta,
+                        },
+                    }
+                },
+            ],
+        });
     }
+    
     
     async update(id, updateData, imageUrls) {
         await Item.update(updateData, { where: { id } });

@@ -7,14 +7,15 @@ class FlashSaleRepository {
   }
 
   async findAllActive() {
-    const currentDate = new Date();  // Ambil waktu saat ini
+    const moment = require("moment-timezone");
+    const nowInJakarta = moment().tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss");
     return await Flashsale.findAll({
       where: {
         start_time: {
-          [Op.lte]: currentDate,  // Pastikan start_time <= waktu sekarang
+            [Op.lte]: nowInJakarta,
         },
         end_time: {
-          [Op.gte]: currentDate,  // Pastikan end_time >= waktu sekarang
+            [Op.gte]: nowInJakarta,
         },
       },
       order: [

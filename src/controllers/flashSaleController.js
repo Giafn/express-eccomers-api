@@ -28,8 +28,17 @@ module.exports = {
                 return res.status(404).json({ message: "Item not found" });
             }
 
+            console.log("JAMAWAL " + req.body.start_time);
+            console.log("JAMAKHIR " + req.body.end_time);
+            const data = {
+                item_id: req.body.item_id,
+                flash_price: req.body.flash_price,
+                start_time: req.body.start_time,
+                end_time: req.body.end_time,
+            };
+
             const createFlashSale = new CreateFlashSale(flashSaleRepository);
-            const flashSale = await createFlashSale.execute(req.body);
+            const flashSale = await createFlashSale.execute(data);
             return res.status(201).json(flashSale);
         } catch (err) {
             return res.status(400).json({ message: err.message });
