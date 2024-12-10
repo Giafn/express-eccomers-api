@@ -11,5 +11,6 @@ router.get("/check/:id", authMiddleware, transactionController.checkPaymentStatu
 router.get("/", authMiddleware, transactionController.getTransaction);
 router.post("/status-update/:id", authMiddleware, transactionController.updateTransactionStatus);
 router.get("/admin", authMiddleware, transactionController.getAllTransaction);
+router.get("/admin/:id", authMiddleware, transactionController.getTransactionById);
 
 module.exports = router;

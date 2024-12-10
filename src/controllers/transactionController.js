@@ -454,5 +454,55 @@ module.exports = {
                 'error': err.message
              });
         }
+    },
+
+    async getTransactionById(req, res) {
+        try {
+            const transactionID = req.params.id;
+            const transactionRepo = new TransactionRepository();
+            const transaction = await transactionRepo.findById(transactionID);
+            if (!transaction) {
+                return res.status(404).json({
+                    "status": "error",
+                    "message": "Transaction not found"
+                });
+            }
+
+            const mappedTransaction = {
+                transactionId: transaction.id,
+                status: transaction.status,
+                orderID: transaction.orderID,
+                address: transaction.address,
+                total: transaction.total_amount,
+                payment_methodmethod: transaction.payment_method,
+                user: {
+                    name: transaction.user.name,
+                    email: transaction.user.email,
+                    telp_number: transaction.user.telp_number
+                },
+                items: transaction.transactionItems.map((transactionItem) => {
+                    return {
+                        id: transactionItem.cartItem.item_id,
+                        quantity: transactionItem.qty,
+                        amount: transactionItem.amount,
+                        name: transactionItem.cartItem.item.name,
+                        images: transactionItem.cartItem.item.images.map((image) => image.url),
+                    };
+                }),
+            };
+
+            return res.status(200).json({
+                "status": "success",
+                "data": mappedTransaction
+            });
+
+        } catch (err) {
+            console.log(err);
+            return res.status(400).json({ 
+                "status": "error",
+                "message": "Failed to get transaction",
+                'error': err.message
+             });
+        }
     }
 };

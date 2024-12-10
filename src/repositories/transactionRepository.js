@@ -11,7 +11,34 @@ class TransactionRepository {
     // sama get relasi ke transaction item
     return await Transaction.
       findByPk(id, {
-        include: 'transactionItems'
+        include: [
+          {
+            association: 'transactionItems',
+            attributes: ['qty', 'amount', 'items_id'],
+            include: [
+              {
+                association: 'cartItem',
+                attributes: ['item_id'],
+                include: [
+                  {
+                    association: 'item',
+                    attributes: ['name'],
+                    include: [
+                      {
+                        association: 'images',
+                        attributes: ['url']
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            association: 'user',
+            attributes: ['name', 'email', 'telp_number']
+          }
+        ]
       });
   }
 
