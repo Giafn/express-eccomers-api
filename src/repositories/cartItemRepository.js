@@ -117,6 +117,7 @@ class CartItemRepository {
             include: {
                 association: "item",
                 attributes: ["name"],
+                required: true,
             },
         });
     }
