@@ -126,13 +126,16 @@ module.exports = {
 
             // decrement stock
             const ItemRepo = new itemRepository();
-            req.body.items.forEach(async item => {
-                await ItemRepo.decrementStock(item.items_id, item.qty);
-                await ItemRepo.incrementPoint(item.items_id, item.qty);
-                await ItemRepo.incrementCountSold(item.items_id, item.qty);
+            req.body.items.forEach(async cart => {
+                const item = await cartItemRepo.getCartItemByCartItemId(cart.items_id);
+                console.log("IDDDDDDDDDD", item);
+
+                await ItemRepo.decrementStock(item.item_id, cart.qty);
+                await ItemRepo.incrementPoint(item.item_id, cart.qty);
+                await ItemRepo.incrementCountSold(item.item_id, cart.qty);
 
                 // delete cart item
-                await cartItemRepo.deleteCartItemByItemId(item.items_id);
+                await cartItemRepo.deleteCartItemByItemId(cart.items_id);
             });
 
             return res.status(201).json({

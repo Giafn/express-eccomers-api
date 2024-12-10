@@ -82,7 +82,10 @@ class ItemRepository {
     }
 
     async incrementCountSold(itemId, qty) {
-        return await Item.increment('count_sold', { by: qty, where: { id: itemId } });
+        qty = parseInt(qty);
+        const item = await this.findById(itemId);
+        console.log("UPDATE COUNT SOLD", item.count_sold + qty);
+        return await Item.update({ count_sold: item.count_sold + qty }, { where: { id: itemId } });
     }
 
     async updateRating(itemId, rating) {

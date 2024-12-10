@@ -7,29 +7,31 @@ class FlashSaleRepository {
   }
 
   async findAllActive() {
+    const currentDate = new Date();  // Ambil waktu saat ini
     return await Flashsale.findAll({
       where: {
         start_time: {
-          [Op.lte]: new Date(),
+          [Op.lte]: currentDate,  // Pastikan start_time <= waktu sekarang
         },
         end_time: {
-          [Op.gte]: new Date(),
+          [Op.gte]: currentDate,  // Pastikan end_time >= waktu sekarang
         },
       },
       order: [
-        ['end_time', 'ASC'],
-        ['start_time', 'ASC'],
+        ['end_time', 'ASC'],  // Urutkan berdasarkan waktu selesai (terdekat)
+        ['start_time', 'ASC'],  // Urutkan berdasarkan waktu mulai (terdekat)
       ],
       include: {
         association: 'item',
-        attributes: ['name', 'price', "rating"],
+        attributes: ['name', 'price', 'rating'],
         include: {
           association: 'images',
           attributes: ['url'],
         },
-      }
+      },
     });
   }
+  
 
   async findAll() {
     return await Flashsale.findAll();
