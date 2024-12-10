@@ -4,6 +4,8 @@ const cartRepository = require('../repositories/cartRepository');
 const cartItemRepository = require('../repositories/cartItemRepository');
 const itemRepository = require('../repositories/itemRepository');
 const userRoyaltyRepository = require('../repositories/userRoyaltyRepository');
+const VoucherRepository = require('../repositories/voucherRepository');
+const UserVoucherRepository = require('../repositories/userVoucherRepository');
 
 const createTransaction = require('../usecases/transaction/createTransaction');
 const createTransactionItems = require('../usecases/transaction/createTransactionItems');
@@ -198,6 +200,41 @@ module.exports = {
                         point: userRoyalty.point + 1,
                         level: level
                     });
+                    const newPoint = userRoyalty.point + 1;
+                    if (newPoint == 1 || newPoint == 3 || newPoint == 7 || newPoint == 15) {
+                        const voucherRepository = new VoucherRepository();
+                        const voucher = await voucherRepository.getVoucherByLevel(level);
+                        
+                        if (!voucher) {
+                            return res.status(404).json({
+                                "status": "error",
+                                "message": "Voucher not found"
+                            }
+                            );
+                        }
+    
+                        let userID = req.user.id;
+                        let insertVoucher = [];
+                        voucher.forEach(v => {
+                            insertVoucher.push({
+                                user_id: userID,
+                                voucher_id: v.id,
+                                remaining: 3,
+                            });
+                        });
+    
+                        const userVoucherRepository = new UserVoucherRepository();
+    
+                        const userVoucher = await userVoucherRepository.batchCreateUserVoucher(insertVoucher);
+                        if (!userVoucher) {
+                            return res.status(404).json({
+                                "status": "error",
+                                "message": "Voucher not found"
+                            }
+                            );
+                        }
+                    }
+
                 }
 
                 await transactionRepo.update(transactionID, {

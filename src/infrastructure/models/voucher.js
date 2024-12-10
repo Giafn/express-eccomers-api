@@ -14,10 +14,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Voucher.init({
+    royalty_level: DataTypes.INTEGER,
     name: DataTypes.STRING,
     disc_type: DataTypes.STRING,
-    min_expense: DataTypes.FLOAT,
-    disc: DataTypes.FLOAT
+    min_expense: DataTypes.ENUM('persen', 'nominal', 'ongkir'),
+    disc: DataTypes.FLOAT,
+    code: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Voucher',
