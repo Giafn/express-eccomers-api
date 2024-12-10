@@ -53,7 +53,7 @@ module.exports = {
             const userVoucher = await userVoucherRepo.getUserVoucherByVoucherCode(req.user.id, req.body.code);
 
             if (!userVoucher) {
-                return res.status(404).json({
+                return res.status(400).json({
                     status: "error",
                     message: "Voucher not found",
                 });
@@ -75,6 +75,7 @@ module.exports = {
                     remaining: userVoucher.remaining,
                     disc_type: userVoucher.voucher.disc_type,
                     min_expense: userVoucher.voucher.min_expense,
+                    disc: userVoucher.voucher.disc,
                 },
             });
 

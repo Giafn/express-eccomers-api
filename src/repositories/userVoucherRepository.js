@@ -31,15 +31,15 @@ class UserVoucherRepository {
     return UserVoucher.bulkCreate(userVouchers);
   }
 
-  async updateUserVoucher(userId, voucherId, remaining) {
+  async updateUserVoucher(userId, voucherId) {
     return UserVoucher.update(
       {
-        remaining,
+        remaining: remaining - 1,
       },
       {
         where: {
+          id: voucherId,
           user_id: userId,
-          voucher_id: voucherId,
         },
       }
     );

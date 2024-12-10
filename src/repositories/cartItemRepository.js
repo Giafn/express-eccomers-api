@@ -79,6 +79,7 @@ class CartItemRepository {
         return await CartItem.destroy({
             where: {
                 id: id,
+                isHidden: false,
             },
         });
     }
@@ -92,7 +93,8 @@ class CartItemRepository {
             },
             {
                 where: {
-                    item_id: itemId,
+                    id: itemId,
+                    isHidden: false,
                 },
             }
         );
